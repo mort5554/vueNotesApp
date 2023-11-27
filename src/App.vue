@@ -1,6 +1,6 @@
 <script setup>
 
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 
 const addNoteState = ref(false)
 const modifyNoteState = ref(false)
@@ -29,6 +29,8 @@ function noteValidation() {
     textAreaContent.value.length <= 10) ? false : true
 }
 
+watch(addNoteState, () => {textAreaContent.value = ''})
+
 function addNote() {
   console.log(noteValidation())
   if (noteValidation()) {
@@ -48,6 +50,7 @@ function addNote() {
 const openModifyNoteModule = (currentNote) => {
   currentModifiedNoteIndex.value = notes.value.indexOf(currentNote)
   modifyNoteState.value = true;
+  textAreaContent.value = notes.value[currentModifiedNoteIndex.value].content
 }
 
 const modifyNote = () => {
@@ -136,8 +139,8 @@ function deleteNote() {
 
 
   .addNoteButton {
-    background-color: black;
-    color: white;
+    background-color: white;
+    color: black;
     border-radius: 100%;
     border: none;
     width: 50px;
@@ -147,13 +150,13 @@ function deleteNote() {
     font-size: 15px;
     cursor: pointer;
     transition: .1s all;
-    border: 1px solid white;
+    border: 1px solid black;
   }
 
   .addNoteButton:hover {
-    background-color: white;
-    color: black;
-    border: 1px solid black;
+    background-color:  #50C878;
+    color: white;
+    border: 1px solid  #50C878;
   }
 
   .notesContainer {
