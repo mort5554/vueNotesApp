@@ -6,7 +6,7 @@ const addNoteState = ref(false)
 const modifyNoteState = ref(false)
 const textAreaContent = ref("")
 const mainId = ref(2)
-const noteErrorHanldeText = "Your note must consist of at least 10 characters!"
+const noteErrorDisplayState = ref(false) 
 const currentModifiedNoteIndex = ref(null)
 const notes = ref([
   {
@@ -24,18 +24,14 @@ const notes = ref([
 ])
 
 function noteValidation() {
+  noteErrorDisplayState.value = true;
    return (
-    textAreaContent.value.length <= 10
-    || textAreaContent.value == noteErrorHanldeText) ? false : true
+    textAreaContent.value.length <= 10) ? false : true
 }
 
 function addNote() {
   console.log(noteValidation())
-  if (!noteValidation()) {
-    textAreaContent.value = noteErrorHanldeText;
-    return 
-  }
-  else {
+  if (noteValidation()) {
     notes.value.push({
       content: textAreaContent.value,
       date: new Date().toLocaleDateString('en-US'),
@@ -45,26 +41,22 @@ function addNote() {
     mainId.value++;
     textAreaContent.value = "";
     addNoteState.value = false;
-    console.log(mainId.value)
+    noteErrorDisplayState.value = false;
   }
 }
 
 const openModifyNoteModule = (currentNote) => {
   currentModifiedNoteIndex.value = notes.value.indexOf(currentNote)
-  console.log(currentModifiedNoteIndex.value)
   modifyNoteState.value = true;
 }
 
 const modifyNote = () => {
 
-if (!noteValidation()) {
-  textAreaContent.value = noteErrorHanldeText;
-  return
-}
-else {
-  notes.value[currentModifiedNoteIndexIndex.value].content = textAreaContent.value;
+if (noteValidation()) {
+  notes.value[currentModifiedNoteIndex.value].content = textAreaContent.value;
   textAreaContent.value = '';
   modifyNoteState.value = false;
+  noteErrorDisplayState.value = false;
 }
 
 }
@@ -85,6 +77,7 @@ function deleteNote() {
         <h3 class="subHeader">Add a note</h3>
         <button class="closeAddNoteOverlay" @click="addNoteState = false">x</button>
       </div>
+      <h5 class="noteErrorMessage" v-show="noteErrorDisplayState">Your note must consist of at least 10 characters!</h5>
       <textarea name="noteContent" id="noteContent" cols="50" rows="20" v-model.trim="textAreaContent"></textarea>
       <button class="addNoteOverlayButton" @click="addNote">Add note</button>
     </div>
@@ -94,6 +87,7 @@ function deleteNote() {
         <h3 class="subHeader">Modify a note</h3>
         <button class="closeAddNoteOverlay" @click="modifyNoteState = false">x</button>
       </div>
+      <h5 class="noteErrorMessage" v-show="noteErrorDisplayState">Your note must consist of at least 10 characters!</h5>
       <textarea name="noteContent" id="noteContent" cols="50" rows="20" v-model.trim="textAreaContent"></textarea>
       <button class="removeNoteOverlayButton" @click="deleteNote">Delete note</button>
       <button class="addNoteOverlayButton" @click="modifyNote">Modify note</button>
@@ -268,6 +262,13 @@ function deleteNote() {
   .subHeader {
     font-size: 33px;
     font-weight: 500;
+  }
+
+  .noteErrorMessage {
+    color: red;
+    font-size: 20px;
+    font-weight: 500;
+    align-self: flex-start;
   }
 
 </style>
