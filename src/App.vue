@@ -7,7 +7,7 @@ const modifyNoteState = ref(false)
 const textAreaContent = ref("")
 const mainId = ref(2)
 const noteErrorHanldeText = "Your note must consist of at least 10 characters!"
-const currentModifiedNote = ref(null)
+const currentModifiedNoteIndex = ref(null)
 const notes = ref([
   {
   content: 'boilerplate note',
@@ -50,8 +50,8 @@ function addNote() {
 }
 
 const openModifyNoteModule = (currentNote) => {
-  currentModifiedNote.value = notes.value.indexOf(currentNote)
-  console.log(currentModifiedNote.value)
+  currentModifiedNoteIndex.value = notes.value.indexOf(currentNote)
+  console.log(currentModifiedNoteIndex.value)
   modifyNoteState.value = true;
 }
 
@@ -62,11 +62,18 @@ if (!noteValidation()) {
   return
 }
 else {
-  notes.value[currentModifiedNote.value].content = textAreaContent.value;
+  notes.value[currentModifiedNoteIndexIndex.value].content = textAreaContent.value;
   textAreaContent.value = '';
   modifyNoteState.value = false;
 }
 
+}
+
+function deleteNote() {
+  notes.value = notes.value.filter((a) => {
+   return a != notes.value[currentModifiedNoteIndex.value]
+  })
+  modifyNoteState.value = false;
 }
 
 </script>
@@ -88,6 +95,7 @@ else {
         <button class="closeAddNoteOverlay" @click="modifyNoteState = false">x</button>
       </div>
       <textarea name="noteContent" id="noteContent" cols="50" rows="20" v-model.trim="textAreaContent"></textarea>
+      <button class="removeNoteOverlayButton" @click="deleteNote">Delete note</button>
       <button class="addNoteOverlayButton" @click="modifyNote">Modify note</button>
     </div>
 
@@ -223,7 +231,7 @@ else {
     font-size: 16px;
   }
 
-  .addNoteOverlayButton {
+  .addNoteOverlayButton, .removeNoteOverlayButton {
     width: 100%;
     background-color: white;
     color: black;
@@ -234,9 +242,19 @@ else {
     transition: .1s all;
     cursor: pointer;
   }
-
   .addNoteOverlayButton:hover {
     background-color: black;
+    color: white;
+  }
+
+  .removeNoteOverlayButton {
+    background-color: white;
+    color: #960018;
+    border: 1px solid #960018;
+  }
+
+  .removeNoteOverlayButton:hover {
+    background-color: #960018;
     color: white;
   }
 
