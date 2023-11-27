@@ -2,45 +2,104 @@
 
 import { ref } from 'vue';
 
-const overlayState = ref(false)
-const textAreaContent = ref(null)
-const mainId = ref(0)
-const notes = ref([{
-  content: 'new me same me',
-  date: '1-12-3-3123',
-  backgroundC: `hsl(${Math.random() * 360}, 100%, 75%)`
-}])
+const addNoteState = ref(false)
+const modifyNoteState = ref(false)
+const textAreaContent = ref("")
+const mainId = ref(2)
+const noteErrorHanldeText = "Your note must consist of at least 10 characters!"
+const currentModifiedNote = ref(null)
+const notes = ref([
+  {
+  content: 'boilerplate note',
+  date: '11/26/2023',
+  backgroundC: `hsl(${Math.random() * 360}, 100%, 75%)`,
+  id: 0
+},
+{
+  content: 'vue is goated',
+  date: '11/27/2023',
+  backgroundC: `hsl(${Math.random() * 360}, 100%, 75%)`,
+  id: 1
+}
+])
+
+function noteValidation() {
+   return (
+    textAreaContent.value.length <= 10
+    || textAreaContent.value == noteErrorHanldeText) ? false : true
+}
 
 function addNote() {
-  notes.value.push({
-    content: textAreaContent.value,
-    date: new Date().toLocaleDateString('en-US'),
-    backgroundC: `hsl(${Math.random() * 360}, 100%, 75%)`,
-    id: mainId
-  })
-  mainId.value++;
-  textAreaContent.value = null;
-  overlayState.value = false;
+  console.log(noteValidation())
+  if (!noteValidation()) {
+    textAreaContent.value = noteErrorHanldeText;
+    return 
+  }
+  else {
+    notes.value.push({
+      content: textAreaContent.value,
+      date: new Date().toLocaleDateString('en-US'),
+      backgroundC: `hsl(${Math.random() * 360}, 100%, 75%)`,
+      id: mainId.value
+    })
+    mainId.value++;
+    textAreaContent.value = "";
+    addNoteState.value = false;
+    console.log(mainId.value)
+  }
+}
+
+const openModifyNoteModule = (currentNote) => {
+  currentModifiedNote.value = notes.value.indexOf(currentNote)
+  console.log(currentModifiedNote.value)
+  modifyNoteState.value = true;
+}
+
+const modifyNote = () => {
+
+if (!noteValidation()) {
+  textAreaContent.value = noteErrorHanldeText;
+  return
+}
+else {
+  notes.value[currentModifiedNote.value].content = textAreaContent.value;
+  textAreaContent.value = '';
+  modifyNoteState.value = false;
+}
+
 }
 
 </script>
 
 <template>
-  <div v-if="overlayState" class="addNoteOverlay">
-    <div class="addNoteContainer">
-      <button class="closeAddNoteOverlay" @click="overlayState = false">x</button>
-      <textarea name="noteContent" id="noteContent" cols="50" rows="20" v-model="textAreaContent"></textarea>
+  <div v-if="addNoteState || modifyNoteState" class="addNoteOverlay">
+    <div class="noteModuleContainer" v-if="addNoteState">
+      <div class="moduleHeader">
+        <h3 class="subHeader">Add a note</h3>
+        <button class="closeAddNoteOverlay" @click="addNoteState = false">x</button>
+      </div>
+      <textarea name="noteContent" id="noteContent" cols="50" rows="20" v-model.trim="textAreaContent"></textarea>
       <button class="addNoteOverlayButton" @click="addNote">Add note</button>
     </div>
+
+    <div class="noteModuleContainer" v-if="modifyNoteState">
+      <div class="moduleHeader">
+        <h3 class="subHeader">Modify a note</h3>
+        <button class="closeAddNoteOverlay" @click="modifyNoteState = false">x</button>
+      </div>
+      <textarea name="noteContent" id="noteContent" cols="50" rows="20" v-model.trim="textAreaContent"></textarea>
+      <button class="addNoteOverlayButton" @click="modifyNote">Modify note</button>
+    </div>
+
   </div>
   <main>
     <header>
         <h1>Notes</h1>
-        <button class="addNoteButton" @click="overlayState = true">+</button>
+        <button class="addNoteButton" @click="addNoteState = true">+</button>
     </header>
 
     <div class="notesContainer">
-      <div class="noteCard" v-for="note in notes" :key="note.id" :style="{backgroundColor: note.backgroundC}">
+      <div class="noteCard" v-for="note in notes" :key="note.id" :style="{backgroundColor: note.backgroundC}" @click="openModifyNoteModule(note)">
         <p>{{ note.content }}</p>
         <p>{{ note.date }}</p>
       </div>
@@ -96,9 +155,9 @@ function addNote() {
   }
 
   .notesContainer {
-    align-self: flex-start;
     padding: 30px;
     display: flex;
+    justify-content: center;
     gap: 25px;
     flex-wrap: wrap;
   }
@@ -113,6 +172,7 @@ function addNote() {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    overflow-wrap: break-word;
   }
 
   .addNoteOverlay {
@@ -125,9 +185,10 @@ function addNote() {
     display: flex;
     justify-content: center;
     align-items: center;
+    z-index: 2;
   }
 
-  .addNoteContainer {
+  .noteModuleContainer {
     padding: 35px;
     display: flex;
     flex-direction: column;
@@ -139,7 +200,6 @@ function addNote() {
   }
 
   .closeAddNoteOverlay {
-    align-self: flex-end;
     border: 1px solid black;
     background-color: white;
     color: black;
@@ -178,6 +238,18 @@ function addNote() {
   .addNoteOverlayButton:hover {
     background-color: black;
     color: white;
+  }
+
+  .moduleHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+  }
+
+  .subHeader {
+    font-size: 33px;
+    font-weight: 500;
   }
 
 </style>
