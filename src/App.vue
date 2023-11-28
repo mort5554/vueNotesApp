@@ -8,20 +8,21 @@ const textAreaContent = ref("")
 const mainId = ref(2)
 const noteErrorDisplayState = ref(false) 
 const currentModifiedNoteIndex = ref(null)
-const notes = ref([
+
+const notes = (function () {
+  if (!localStorage.getItem('notes')) {
+    return ref([
   {
   content: 'boilerplate note',
   date: '11/26/2023',
   backgroundC: `hsl(${Math.random() * 360}, 100%, 75%)`,
   id: 0
-},
-{
-  content: 'vue is goated',
-  date: '11/27/2023',
-  backgroundC: `hsl(${Math.random() * 360}, 100%, 75%)`,
-  id: 1
+}])
 }
-])
+  else {
+    return ref(JSON.parse(localStorage.getItem('notes')))
+ }
+})()
 
 function noteValidation() {
   noteErrorDisplayState.value = true;
@@ -44,6 +45,8 @@ function addNote() {
     textAreaContent.value = "";
     addNoteState.value = false;
     noteErrorDisplayState.value = false;
+    localStorage.setItem('notes', JSON.stringify(notes.value))
+    console.log(notes.value)
   }
 }
 
@@ -60,6 +63,7 @@ if (noteValidation()) {
   textAreaContent.value = '';
   modifyNoteState.value = false;
   noteErrorDisplayState.value = false;
+  localStorage.setItem('notes', JSON.stringify(notes.value))
 }
 
 }
@@ -69,6 +73,7 @@ function deleteNote() {
    return a != notes.value[currentModifiedNoteIndex.value]
   })
   modifyNoteState.value = false;
+  localStorage.setItem('notes', JSON.stringify(notes.value))
 }
 
 </script>
