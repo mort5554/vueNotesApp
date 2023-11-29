@@ -4,7 +4,7 @@ import { ref, watch } from 'vue';
 
 const addNoteState = ref(false)
 const modifyNoteState = ref(false)
-const textAreaContent = ref("")
+const textAreaContent = ref("")sraka
 const mainId = ref(2)
 const noteErrorDisplayState = ref(false) 
 const currentModifiedNoteIndex = ref(null)
